@@ -1,0 +1,19 @@
+﻿生成启动时间为 2021/7/21 21:31:02。
+     1>项目“G:\c++ file\C++string模拟实现\C++string模拟实现\C++string模拟实现.vcxproj”在节点 2 上(Build 个目标)。
+     1>ClCompile:
+         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\CL.exe /c /ZI /nologo /W3 /WX- /sdl /Od /Oy- /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc120.pdb" /Gd /TP /analyze- /errorReport:prompt test.cpp
+         test.cpp
+     1>g:\c++ file\c++string模拟实现\c++string模拟实现\string.h(93): warning C4018: “>”: 有符号/无符号不匹配
+     1>g:\c++ file\c++string模拟实现\c++string模拟实现\string.h(105): warning C4018: “>”: 有符号/无符号不匹配
+     1>g:\c++ file\c++string模拟实现\c++string模拟实现\string.h(129): warning C4018: “>”: 有符号/无符号不匹配
+     1>g:\c++ file\c++string模拟实现\c++string模拟实现\string.h(211): warning C4018: “<”: 有符号/无符号不匹配
+     1>g:\c++ file\c++string模拟实现\c++string模拟实现\string.h(232): warning C4018: “<”: 有符号/无符号不匹配
+     1>g:\c++ file\c++string模拟实现\c++string模拟实现\string.h(247): warning C4018: “<”: 有符号/无符号不匹配
+       Link:
+         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"G:\c++ file\C++string模拟实现\Debug\C++string模拟实现.exe" /INCREMENTAL /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"G:\c++ file\C++string模拟实现\Debug\C++string模拟实现.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"G:\c++ file\C++string模拟实现\Debug\C++string模拟实现.lib" /MACHINE:X86 Debug\test.obj
+         C++string模拟实现.vcxproj -> G:\c++ file\C++string模拟实现\Debug\C++string模拟实现.exe
+     1>已完成生成项目“G:\c++ file\C++string模拟实现\C++string模拟实现\C++string模拟实现.vcxproj”(Build 个目标)的操作。
+
+生成成功。
+
+已用时间 00:00:01.22
