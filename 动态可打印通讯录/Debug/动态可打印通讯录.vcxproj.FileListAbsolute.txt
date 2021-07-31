@@ -1,0 +1,2 @@
+G:\c files\动态可打印通讯录\Debug\动态可打印通讯录.exe
+G:\c files\动态可打印通讯录\Debug\动态可打印通讯录.pdb
