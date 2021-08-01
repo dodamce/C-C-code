@@ -11,6 +11,7 @@ namespace My
 	public:
 		//µü´úÆ÷
 		typedef char* iterator;
+		typedef const char* const_iterator;
 		iterator begin()
 		{
 			return _src;
@@ -93,14 +94,14 @@ namespace My
 			if (i > capacity)
 			{
 				char*tmp = new char[i + 1];
-				strcpy(tmp, _src);
+				strncpy(tmp, _src,size);
 				delete[]_src;
 				_src = tmp;
 				capacity = i;
 			}
 		}
 
-		void resize(size_t i, char ch='*')
+		void resize(size_t i, char ch='\0')
 		{
 			if (i > capacity)
 			{
@@ -145,6 +146,11 @@ namespace My
 		{
 			append(soc);
 			return *this;
+		}
+
+		void clean()
+		{
+			size = 0;
 		}
 
 		bool operator<(const string& s)
@@ -278,4 +284,39 @@ namespace My
 		int size;
 		int capacity;
 	};
+}
+
+ostream& operator<<(ostream& out,My::string&s)
+{
+	for (auto e : s)
+	{
+		out << e;
+	}
+	return out;
+}
+
+istream& operator>>(istream& in, My::string&s)
+{
+	s.clean();
+	char ch;
+	ch = in.get();
+	while (ch != ' '&&ch != '\n')
+	{
+		s += ch;
+		ch = in.get();
+	}
+	return in;
+}
+
+istream& getline(istream& in, My::string&s)
+{
+	s.clean();
+	char ch;
+	ch = in.get();
+	while (ch != '\n')
+	{
+		s += ch;
+		ch = in.get();
+	}
+	return in;
 }
