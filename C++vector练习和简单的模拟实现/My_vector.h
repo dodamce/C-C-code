@@ -1,5 +1,6 @@
 #include<iostream>
 #include<assert.h>
+#include<string>
 
 
 using namespace std;
@@ -18,6 +19,33 @@ namespace My
 			, _endofstorage(nullptr)
 		{}
 
+		//迭代器初始化(需要两个模板参数)
+		template < class InputIterator>
+		vector(InputIterator begin, InputIterator end)
+			:_start(nullptr),
+			_finish(nullptr),
+			_endofstorage(nullptr)
+		{
+			while (begin != end)
+			{
+				push_back(*begin);
+				++begin;
+			}
+		}
+
+		vector(int n, T val)//n个值初始化
+			:_start(nullptr),
+			_finish(nullptr),
+			_endofstorage(nullptr)
+		{
+			reserve(n);
+			for (int i = 0; i < n; i++)
+			{
+				push_back(val);
+			}
+			
+		}
+
 		~vector()
 		{
 			if (_start != nullptr)
@@ -25,6 +53,51 @@ namespace My
 				delete[]_start;
 			}
 			_start = _finish = _endofstorage = 0;
+		}
+
+		//拷贝函数
+		vector(const vector<T>&v)
+			:_start(nullptr),
+			_finish(nullptr),
+			_endofstorage(nullptr)
+		{
+			reserve(v.capcity());
+			for (auto e : v)
+			{
+				push_back(e);
+			}
+			/*_start = new T[v.capcity()];
+			memcpy(_start, v._start, sizeof(T)*v.size());
+			_finish = _start + v.size();
+			_endofstorage = _start + v.capcity();*/
+		}
+
+		//=重载
+		/*vector<T>&operator=(const vector<T>&v)
+		{
+			if (this != &v)
+			{
+				delete[]_start;
+				_start = new T[v.capcity()];
+				memcpy(_start, v._start, sizeof(T)*v.size());
+				_finish = _start + v.size();
+				_endofstorage = _start + v.capcity();
+			}
+			return *this;
+		}*/
+
+		void swap(vector<int>&v)
+		{
+			::swap(_start, v._start);
+			::swap(_finish, v._finish);
+			::swap(_endofstorage, v._endofstorage);
+		}
+
+		vector<T>&operator=(const vector<T>&v)
+		{
+			vector<T>tmp(v);
+			swap(tmp);
+			return *this;
 		}
 
 		//迭代器
@@ -66,8 +139,12 @@ namespace My
 				int sz = size();
 				if (_start)//原数据不是空,需要拷贝数据
 				{
-					memcpy(tmp, _start,sz*sizeof(T));
-					delete[] _start;
+					for (int i = 0; i < sz; i++)
+					{
+						tmp[i] = _start[i];//利用=重载深拷贝
+					}
+					/*memcpy(tmp, _start,sz*sizeof(T));*///注意如果T类型是string是memcpy可能将里面的_str进行浅拷贝，在deleat时会删除数据
+					delete[] _start;//当T为内置类型，则不会发生浅拷贝问题，当T为自定义类型时可能会出现问题
 				}
 				_start = tmp;
 				_finish = _start +sz ;

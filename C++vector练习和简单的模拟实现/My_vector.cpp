@@ -80,11 +80,60 @@ void TestVector4()//…æ≥˝≤‚ ‘
 	My::PrintVector(v);
 }
 
+void TestVector5()//≤‚ ‘øΩ±¥ππ‘Ï∫Ø ˝ ,=÷ÿ‘ÿ
+{
+	My::vector<int> v;
+	v.push_back(1);
+	v.push_back(2);
+	v.push_back(3);
+	v.push_back(4);
+	v.push_back(5);
+	My::PrintVector(v);
+	My::vector<int> v2(v);
+	My::PrintVector(v2);
+	My::vector<int> v3;
+	v3 = v2;
+	My::PrintVector(v3);
+}
+
+void TestVector6()//≤‚ ‘◊÷∑˚¥Æ
+{
+	My::vector<string>v;
+	v.push_back("11111111111111");
+	v.push_back("2222");
+	v.push_back("3333");
+	v.push_back("4444");
+	v.push_back("5555");
+	v.push_back("6666");
+	v.push_back("6666");
+	for (int i = 0; i < v.size(); i++)
+	{
+		cout << v[i] << "  ";
+	}
+}
+
+void TestVector7()//≤‚ ‘∏˜÷÷øΩ±¥ππ‘Ï
+{
+	My::vector<int> v;
+	v.push_back(1);
+	v.push_back(2);
+	v.push_back(3);
+	v.push_back(4);
+	v.push_back(5);
+	My::vector<int>v2(v.begin(), v.end());
+	My::PrintVector(v2);
+	My::vector<int>v3(10, 2);
+	My::PrintVector(v3);
+}
+
 int main()
 {
 	//TestVector1();
 	//TestVector2();
 	//TestVector3();
-	TestVector4();
+	//TestVector4();
+	//TestVector5();
+	//TestVector6();
+	TestVector7();
 	return 0;
 }
