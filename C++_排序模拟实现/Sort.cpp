@@ -56,9 +56,19 @@ void Test6()//测试快速排序
 	vector<int>s = { 2,1,4,2,4,1,3 };
 	Sort<int>::Quick_Sort(s,0,s.size()-1);
 	Print(s);
-	vector<float>s2 = { 1.1,3.2,5.3,1.8 };
-	Sort<float>::Quick_Sort(s2,0,s2.size()-1);
+	vector<int>s2 = { 2,1,4,2,4,1,3 };
+	Sort<int>::Quick_Sort_stack(s2, 0, s2.size() - 1);
 	Print(s2);
+}
+
+void Test7()//测试计数排序(只支持整形排序，因为对应数组小标不能为小数)
+{
+	vector<int>s = { 2,1,4,2,4,1,3 };
+	Sort<int>::Count_Sort(s);
+	Print(s);
+	/*vector<float>s2 = { 1.1,3.2,5.3,1.8 };
+	Sort<float>::Count_Sort(s2);//小数不支持，小数排序要哈希表自定义键值，这里不设计
+	Print(s2);*/
 }
 
 int main()
@@ -69,4 +79,5 @@ int main()
 	//Test4();
 	//Test5();
 	Test6();
+	//Test7();
 }

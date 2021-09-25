@@ -4,6 +4,8 @@
 
 #include<vector>
 
+#include<stack>
+
 using namespace std;
 
 //打印排序好的数组
@@ -60,7 +62,12 @@ public:
      key后的数字都比key大。这样key在数组的位置就放好了。
      2.然后选择递归或者栈处理key之前和key之后的数组。
 	*/
-	static void Quick_Sort(vector<T>&, int left,int right);//快速排序
+	static void Quick_Sort(vector<T>&, int left,int right);//快速排序递归写法
+	static void Quick_Sort_stack(vector<T>& dev, int left, int right);//快速排序非递归写法
+
+	//计数排序
+	//找到最大值，最小值。创建一个数组，把原数组中的元素按照数量放到新创建的数组中去
+	static void Count_Sort(vector<T>&);
 };
 
 template<class T>
@@ -255,7 +262,7 @@ template<class T>
 int _PartSort_Hode(vector<T>&dev, int left, int right)
 {
 	int mid = GetMidIndex(dev, left, right);
-	swap(&dev[left], &dev[mid]);
+	swap(dev[left], dev[mid]);
 	int key = dev[left];//与上面的思路类似
 	while (left < right)
 	{
@@ -314,4 +321,73 @@ void Sort<T>::Quick_Sort(vector<T>& dev,int left,int right)//递归写法
 	Quick_Sort(dev, left, key - 1);
 	//递归右区间
 	Quick_Sort(dev, key + 1, right);
+}
+
+//快速排序非递归写法,利用栈模拟递归
+template<class T>
+void Sort<T>::Quick_Sort_stack(vector<T>& dev, int left, int right)
+{
+	stack<int>tmp;
+	tmp.push(left); tmp.push(right);
+	while (!tmp.empty())
+	{
+		int left = tmp.top();
+		tmp.pop();
+		int right = tmp.top();
+		tmp.pop();
+		int key = _PartSort_Pointer(dev, left, right);
+		if (left < key - 1)//左区间
+		{
+			tmp.push(left);
+			tmp.push(key - 1);
+		}
+		if (right > key + 1)//右区间
+		{
+			tmp.push(key + 1);
+			tmp.push(right);
+		}
+	}
+}
+
+template<class T>
+void Sort<T>::Count_Sort(vector<T>& dev)//不支持小数，只支持整形
+{
+	//找dev数组的最大值最小值
+	int max = dev[0];
+	int min = dev[0];
+	for (int i = 0; i < dev.size(); i++)
+	{
+		if (dev[i] > max)
+		{
+			max = dev[i];
+		}
+		if (dev[i] < min)
+		{
+			min = dev[i];
+		}
+	}
+	int arrSize = max - min + 1;//如果最大值=最小值，此时数组的大小为1
+	int* Hash = new int[arrSize];
+	//新数组必须初始化成0，因为这个数组起到计数的作用
+	if (Hash == nullptr)
+	{
+		exit(-1);
+	}
+	memset(Hash, 0, sizeof(int) * arrSize);
+	for (int i = 0; i < dev.size(); i++)
+	{
+		Hash[dev[i] - min]++;
+	}
+	int j = 0;
+	for (int i = 0; i < arrSize; i++)
+	{
+		if (Hash[i] != 0)
+		{
+			while (Hash[i]--)
+			{
+				dev[j] = i + min;
+				j++;
+			}
+		}
+	}
 }
