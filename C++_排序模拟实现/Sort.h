@@ -6,6 +6,7 @@
 
 #include<stack>
 
+
 using namespace std;
 
 //打印排序好的数组
@@ -65,9 +66,14 @@ public:
 	static void Quick_Sort(vector<T>&, int left,int right);//快速排序递归写法
 	static void Quick_Sort_stack(vector<T>& dev, int left, int right);//快速排序非递归写法
 
-	//计数排序
+	//计数排序(哈希排序)
 	//找到最大值，最小值。创建一个数组，把原数组中的元素按照数量放到新创建的数组中去
 	static void Count_Sort(vector<T>&);
+
+	//归并排序(递归写法)
+	static void Merge_Sort(vector<T>&);
+	//归并排序(非递归写法)
+	static void Merge_Sort_NotR(vector<T>&);
 };
 
 template<class T>
@@ -328,7 +334,7 @@ template<class T>
 void Sort<T>::Quick_Sort_stack(vector<T>& dev, int left, int right)
 {
 	stack<int>tmp;
-	tmp.push(left); tmp.push(right);
+	tmp.push(right); tmp.push(left);
 	while (!tmp.empty())
 	{
 		int left = tmp.top();
@@ -338,13 +344,13 @@ void Sort<T>::Quick_Sort_stack(vector<T>& dev, int left, int right)
 		int key = _PartSort_Pointer(dev, left, right);
 		if (left < key - 1)//左区间
 		{
+			tmp.push(key - 1);//相当于把每次要处理的坐标位置存到栈中
 			tmp.push(left);
-			tmp.push(key - 1);
 		}
 		if (right > key + 1)//右区间
 		{
-			tmp.push(key + 1);
 			tmp.push(right);
+			tmp.push(key + 1);
 		}
 	}
 }
@@ -390,4 +396,103 @@ void Sort<T>::Count_Sort(vector<T>& dev)//不支持小数，只支持整形
 			}
 		}
 	}
+}
+
+//归并排序
+//先将数组分成两段，记作left段和right段
+//将left段排成有序，将right段排成有序
+//最后将left和right段排成有序.
+//所以要先递归到数组大小只有一个为止，将最小元素先排成有序在递归回，类似二叉树的后序遍历
+//这里利用另一个数组，把拍好的数字放到新数组中，最后在把新数组的数字放回到原数组中
+template<class T>
+void _Merge(vector<T>&dev,T*tmp,int begin1,int end1,int begin2,int end2)
+{
+	int i = begin1;
+	int i2 = begin1;
+	//将两个区间先排成有序
+	while (begin1 <= end1 && begin2 <= end2)//这两个区间都有数据时
+	{
+		if (dev[begin1] < dev[begin2])
+		{
+			tmp[i++] = dev[begin1++];
+		}
+		else
+		{
+			tmp[i++] = dev[begin2++];
+		}
+	}
+	while (begin1 <= end1)//当第一段还有剩余的时候把它全部拷贝到tmp数组中
+	{
+		tmp[i++] = dev[begin1++];
+	}
+	while (begin2 <= end2)//当第二段还有剩余的时候把它全部拷贝到tmp数组中
+	{
+		tmp[i++] = dev[begin2++];
+	}
+	//将tmp数组中排好序的元素放回dev数组中
+	for (int i = i2; i <= end2; i++)
+	{
+		dev[i] = tmp[i];
+	}
+}
+
+template<class T>
+void _Merge_Sort(vector<T>& dev, T* tmp, int left, int right)
+{
+	if (left >= right)//递归结束的条件
+	{
+		return;
+	}
+	int mid = (left + right) / 2;
+	_Merge_Sort(dev, tmp, left, mid);//递归左
+	_Merge_Sort(dev, tmp, mid + 1, right); //递归右
+	_Merge(dev, tmp, left, mid, mid + 1, right);//递归到最小单元后，将最小单元排成有序的
+}
+
+template<class T>
+void Sort<T>::Merge_Sort(vector<T>& dev)
+{
+	T* tmp = (T*)malloc(sizeof(int) * dev.size());
+	if (tmp == nullptr)
+	{
+		return;
+	}
+	_Merge_Sort(dev, tmp, 0, dev.size() - 1);//递归子函数
+	free(tmp);
+}
+
+//归并排序非递归写法
+//思路：先定义grap=1，直接从最小的一个数开始归并，归并一趟后记录宽度的grap*2
+//利用for循环来控制归并次数。当grap的宽度>=size-1表明最后一次归并完成
+template<class T>
+void Sort<T>::Merge_Sort_NotR(vector<T>& dev)
+{
+	T* tmp = (T*)malloc(sizeof(int) * dev.size());
+	if (tmp == nullptr)
+	{
+		return;
+	}
+	int grap = 1;//开始处理宽度为1
+	while (grap < dev.size())//当grap小于size时说明还没有进行最后一次归并
+	{
+		for (int i = 0; i < dev.size(); i += 2 * grap)
+		{
+			int begin1 = i;
+			int end1 = i + grap - 1;
+			int begin2 = i + grap;
+			int end2 = i + 2 * grap - 1;
+			//注意两种特殊情况：
+			if (begin2 >= dev.size())//说明right数组不存在不进行归并right
+			{
+				break;
+			}
+			if (end2 >= dev.size())//说明right数组部分越界，只用归并没有越界部分的数据
+			{
+				end2 = dev.size() - 1;
+			}
+			_Merge(dev, tmp, begin1, end1, begin2, end2);
+		}
+		grap = grap * 2;
+	}
+	free(tmp);
 }

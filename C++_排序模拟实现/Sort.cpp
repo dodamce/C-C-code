@@ -54,10 +54,10 @@ void Test5()//测试堆排序
 void Test6()//测试快速排序
 {
 	vector<int>s = { 2,1,4,2,4,1,3 };
-	Sort<int>::Quick_Sort(s,0,s.size()-1);
+	Sort<int>::Quick_Sort(s,0,s.size()-1);//递归
 	Print(s);
 	vector<int>s2 = { 2,1,4,2,4,1,3 };
-	Sort<int>::Quick_Sort_stack(s2, 0, s2.size() - 1);
+	Sort<int>::Quick_Sort_stack(s2, 0, s2.size() - 1);//非递归
 	Print(s2);
 }
 
@@ -71,6 +71,16 @@ void Test7()//测试计数排序(只支持整形排序，因为对应数组小标不能为小数)
 	Print(s2);*/
 }
 
+void Test8()//测试归并排序
+{
+	vector<int>s = { 2,1,4,2,4,1,3 };
+	Sort<int>::Merge_Sort(s);//递归
+	Print(s);
+	vector<float>s2 = { 1.1,3.2,5.3,1.8 };
+	Sort<float>::Merge_Sort_NotR(s2);//非递归
+	Print(s2);
+}
+
 int main()
 {
 	/*Test1();
@@ -78,6 +88,7 @@ int main()
 	Test3();*/
 	//Test4();
 	//Test5();
-	Test6();
+	//Test6();
 	//Test7();
+	Test8();
 }
