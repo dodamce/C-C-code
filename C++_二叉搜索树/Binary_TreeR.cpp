@@ -31,8 +31,24 @@ void Test2()//测试删除操作
 	}
 }
 
+//测试拷贝构造函数和运算符重载
+void Test3()
+{
+	MyR_Key::BSTree<int>Tree;
+	for (int i = 10; i > 0; i--)
+	{
+		Tree.Insert(i);
+	}
+	MyR_Key::BSTree<int>TreeCopy(Tree);
+	TreeCopy.PrintBSTree();
+	MyR_Key::BSTree<int>TreeSame;
+	TreeSame = TreeCopy;
+	TreeSame.PrintBSTree();
+}
+
 int main()
 {
 	//Test1();
-	Test2();
+	//Test2();
+	Test3();
 }

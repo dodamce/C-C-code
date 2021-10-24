@@ -26,6 +26,25 @@ namespace MyR_Key
 			:_root(nullptr)
 		{}
 
+		~BSTree()
+		{
+			Destory();
+			_root = nullptr;
+		}
+
+		//拷贝构造函数(深拷贝)
+		BSTree(const BSTree<Key>& dev)
+		{
+			_root = _Copy(dev._root);
+		}
+
+		//赋值运算符重载
+		BSTree<Key>&operator=(BSTree<Key> dev)
+		{
+			swap(_root, dev._root);
+			return *this;
+		}
+
 		//节点查找
 		Node* Find(const Key& key)
 		{
@@ -50,6 +69,10 @@ namespace MyR_Key
 			return _Erase(_root, key);
 		}
 
+		void Destory()
+		{
+			_Destory(_root);
+		}
 	private:
 		Node* _root;
 
@@ -108,6 +131,25 @@ namespace MyR_Key
 			if (root->_right)
 				_PrintBSTree(root->_right);
 		}
+
+		void _Destory(Node* root)//后序遍历销毁
+		{
+			if (root == nullptr)
+				return;
+			_Destory(root->_left);
+			_Destory(root->_right);
+			delete root;
+		}
+
+		Node* _Copy(Node* root)
+		{
+			if (root == nullptr)
+				return nullptr;
+			Node* CopNode = new Node(root->_key);
+			CopNode->_left = _Copy(root->_left);
+			CopNode->_right = _Copy(root->_right);
+			return CopNode;
+		}
 	};
 }
 
@@ -151,6 +193,7 @@ bool MyR_Key::BSTree<Key>::_Erase(Node*& root, const Key& key)
 			Key tmp = minRight->_key;//先保存右子树的最小值
 			_Erase(root->_right, tmp);//递归删除右子树的最小值
 			root->_key = tmp;//将右子树的最小值赋给要删除节点
+			return true;
 		}
 	}
 }
