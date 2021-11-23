@@ -5,19 +5,19 @@ using namespace std;
 
 enum Color
 {
-	RED = 0, BLACK,
+	RED = 0, BLACK, 
 };
 
 template<class T>
 struct RBTreeNode
 {
-	RBTreeNode* _left;
-	RBTreeNode* _right;
-	RBTreeNode* _parent;
+	RBTreeNode<T>* _left;
+	RBTreeNode<T>* _right;
+	RBTreeNode<T>* _parent;
 	T _val;
 	Color col;
 	RBTreeNode(const T& val)
-		:_left(nullptr), _right(nullptr), _parent(nullptr), _val(val), col(BLACK)//默认节点颜色
+		:_left(nullptr), _right(nullptr), _parent(nullptr), _val(val), col(RED)//默认节点颜色
 	{}
 };
 
@@ -27,6 +27,8 @@ struct TreeIterator
 {
 	typedef RBTreeNode<T> Node;
 	typedef TreeIterator<T, Ref, Ptr> Iterator;
+	typedef Ref refence;//反向迭代器
+	typedef Ptr pointer;
 	Node* _root;
 	//构造函数
 	TreeIterator(Node*root)
@@ -43,9 +45,14 @@ struct TreeIterator
 		return &(_root->_val);
 	}
 
-	bool operator !=(const Iterator&ptr)
+	bool operator !=(const Iterator&ptr)const
 	{
 		return _root != ptr._root;//节点的指针不相同。
+	}
+
+	bool operator ==(const Iterator& ptr)const
+	{
+		return _root == ptr._root;
 	}
 
 	Iterator& operator++()//因为没有占位int所以是前置++，Iterator& operator++(int)为后置++
@@ -72,6 +79,77 @@ struct TreeIterator
 		}
 		return *this;
 	}
+
+	
+
+	Iterator& operator--()
+	{
+		if (_root->_left)//左树的最右节点
+		{
+			Node* cur = _root->_left;
+			while (cur->_right != nullptr)
+			{
+				cur = cur->_right;
+			}
+			_root = cur;
+		}
+		else
+		{
+			Node* cur = _root;
+			Node* parent = cur->_parent;
+			while (parent != nullptr && cur == parent->_left)
+			{
+				cur = parent;
+				parent = parent->_parent;
+			}
+			_root = parent;
+		}
+		return *this;
+	}
+};
+
+//迭代器适配器实现反向迭代器
+template<class RIterator>
+struct Reserve_Iterator
+{
+	typedef typename RIterator::refence Ref;
+	typedef typename RIterator::pointer Ptr;
+	typedef Reserve_Iterator<RIterator> Iterator;
+	Reserve_Iterator(RIterator ptr) :_it(ptr) {}
+
+	Ref operator*()
+	{
+		return *_it;
+	}
+
+	Ref operator->()
+	{
+		return *_it.operator->();
+	}
+
+	Iterator& operator++()
+	{
+		--_it;
+		return *this;
+	}
+
+	Iterator& operator--()
+	{
+		++_it;
+		return *this;
+	}
+
+	bool operator!=(const Iterator& dev)
+	{
+		return _it != dev._it;
+	}
+
+	bool operator==(const Iterator& dev)
+	{
+		return _it == dev._it;
+	}
+
+	RIterator _it;
 };
 
 template<class k,class T,class KeyOfValue>//用仿函数标志到底是map还是set
@@ -79,8 +157,9 @@ class RBTree
 {
 	typedef RBTreeNode<T> Node;
 public:
-	typedef TreeIterator<T,T&,T*> iterator;
-
+	typedef TreeIterator<T,T&,T*> iterator;//普通迭代器
+	typedef Reserve_Iterator<iterator> reserve_iterator;//反向迭代器
+	typedef TreeIterator<T, const T&, const T*> const_iterator;
 	iterator begin()//迭代器
 	{
 		Node* tmp = _root;
@@ -90,6 +169,22 @@ public:
 			tmp = tmp->_left;
 		}
 		return iterator(tmp);//迭代器构造函数
+	}
+
+	reserve_iterator rbegin()//找最右节点
+	{
+		Node* tmp = _root;
+		//找最右
+		while (tmp != nullptr && tmp->_right != nullptr)
+		{
+			tmp = tmp->_right;
+		}
+		return reserve_iterator(iterator(tmp));
+	}
+
+	reserve_iterator rend()
+	{
+		return reserve_iterator(iterator(nullptr));
 	}
 
 	iterator end()//尾迭代器遵守左闭右开原则，为空
@@ -155,14 +250,14 @@ public:
 		return ret;
 	}
 
-	pair<Node*, bool>Insert(const T& val)//红黑树的插入
+	pair<iterator, bool>Insert(const T& val)//红黑树的插入
 	{
 		KeyOfValue kov;
 		if (_root == nullptr)
 		{
 			_root = new Node(val);
 			_root->col = BLACK;
-			return make_pair(_root, true);
+			return make_pair(iterator(_root), true);
 		}
 		//二叉搜索树插入
 		Node* cur = _root;
@@ -181,7 +276,7 @@ public:
 			}
 			else//键值重复,插入失败
 			{
-				return make_pair(cur, false);
+				return make_pair(iterator(cur), false);
 			}
 		}
 		cur = new Node(val);
@@ -259,7 +354,7 @@ public:
 			}
 		}
 		_root->col = BLACK;//将根的颜色变为黑色，防止上面的过程将根节点变为红色
-		return make_pair(End, true);
+		return make_pair(iterator(End), true);
 	}
 private:
 	Node* _root;
