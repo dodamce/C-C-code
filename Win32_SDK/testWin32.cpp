@@ -3,6 +3,15 @@
 //uMeg消息编号,返回函数指针
 LRESULT CALLBACK WindowsProc(HWND hWnd, UINT uMeg, WPARAM wParam, LPARAM lParam)
 {
+	switch (uMeg)
+	{
+	case WM_CLOSE:
+		DestroyWindow(hWnd);//销毁窗口
+		break;
+	case WM_DESTROY://窗口销毁消息
+		PostQuitMessage(0);
+		break;
+	}
 	return DefWindowProc(hWnd, uMeg, wParam, lParam);
 }
 
