@@ -3,6 +3,8 @@
 
 #define TIME_ID  5  //时间定时器
 
+#define DOD_UMTEST (WM_USER+1)   //1024之前都是系统定义的，自己定义要在1024之后即WM_USER之后
+
 /*
 	消息分类：
 	1.进队列消息：会从消息队列中取出消息，大部分用户输入的消息都是进队消息
@@ -20,12 +22,29 @@ ATOM 字 unsigned short
 DWORD 双字 unsigned long
 */
 
+/* 
+	SetMessage:执行完函数后返回，阻塞式等待返回,返回一个消息的处理结果
+	PostMessage:只负责将消息投递出去，成功返回1失败0，不关心消息处理结果
+	如果跨进程最好用PostMessage
+*/
+
+/*
+	用户自定义消息
+
+*/
 
 //uMeg消息编号,返回函数指针
 LRESULT CALLBACK WindowsProc(HWND hWnd, UINT uMeg, WPARAM wParam, LPARAM lParam)
 {
 	switch (uMeg)
 	{
+		case DOD_UMTEST://用户自定义消息，取消定时器
+		{
+			KillTimer(hWnd, TIME_ID);
+
+			//设置标题
+			SetWindowText(hWnd, L"dodamce");
+		}
 		case WM_CREATE://创建窗口消息
 		{
 			CREATESTRUCT* ipcs = (CREATESTRUCT*)lParam;//CREATESTRUCT结构体，保存的是注册窗口的信息
@@ -111,20 +130,32 @@ LRESULT CALLBACK WindowsProc(HWND hWnd, UINT uMeg, WPARAM wParam, LPARAM lParam)
 			//此时wparam保存的是虚拟键盘值
 			switch (wParam)
 			{
-				case VK_SPACE://空格,暂停时间
+				case VK_SPACE://空格,模拟鼠标按键
 				{
-					MessageBox(hWnd, L"空格键-时间暂停", L"提示", MB_OK);
-					//关闭计时器
-					KillTimer(hWnd, TIME_ID);
+					int x = 50; int y = 150;
+					//将坐标合成4字，a是低位b是高位
+					SendMessage(hWnd, WM_LBUTTONDOWN, 0, MAKELONG(x, y));
 					break;
 				}
-				case VK_SHIFT:
+				case VK_SHIFT://按下SHIFT向指定窗口(记事本)发送信号
 				{
+					HWND hWndNotPead = FindWindow(L"Notepad", NULL);//向记事本窗口类发送消息
+					if (hWndNotPead == NULL)
+					{
+						MessageBox(hWnd, L"找不到记事本", L"提示", MB_OK);
+						return 1;
+					}
+					PostMessage(hWndNotPead, WM_CLOSE, 0, 0);//WM_CLOSE消息不用传信息
 					break;
 				}
 				case VK_ESCAPE:
 				{
 					break;
+				}
+				case VK_RETURN://回车键发送自定义消息
+				{
+					MessageBox(hWnd, L"取消时间", L"提示", MB_OK);
+					PostMessage(hWnd, DOD_UMTEST, 0, 0);
 				}
 				//.....
 				case VK_LEFT://左键
