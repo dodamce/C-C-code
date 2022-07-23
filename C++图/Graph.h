@@ -320,6 +320,165 @@ namespace matrix {
 			std::cout << std::endl;
 		}
 
+		//单源最短路径
+		//src:源顶点 dist保存src到各个顶点的最短距离 pPath:保存最短路径的节点
+		void Dijkstra(const v& src, std::vector<w>& dist, std::vector<int>& pPath) {
+			size_t srcPos = GetPointIndex(src);
+			size_t size = _vertexs.size();
+			dist.resize(size, max_w);
+			pPath.resize(size, -1);
+
+			dist[srcPos] = 0;//源顶点到自己本身最短距离为0
+			pPath[srcPos] = srcPos;//源顶点的最短路径的父节点是自己本身
+			
+			std::vector<bool>S(size, false);//已经确定最短路径的顶点的集合
+			//循环判断所有的顶点
+			for (size_t time = 0; time < size; time++) {
+				//选不在S集合 最短路径的顶点，更新其他路径
+				//选p点,p点不在S集合中
+				int p = 0;
+				w min = max_w;//最小权值
+				for (size_t i = 0; i < size; i++) {
+					if (S[i] == false && dist[i] < min) {
+						p = i;
+						min = dist[i];
+					}
+				}
+				//把p点放入S集合中
+				S[p] = true;
+				//松弛更新 src->p + p->p邻接节点 与 src ->p邻接节点权值相比较小，要更新
+				for (size_t adP = 0; adP < size; adP++) {
+					//找p点所有的邻接顶点
+					if (S[adP] == false && _matrix[p][adP] != max_w) {
+						if ((dist[p] + _matrix[p][adP]) < dist[adP]) {
+							dist[adP] = dist[p] + _matrix[p][adP];
+							//更新这个顶点最短路径的父节点
+							pPath[adP] = p;
+						}
+					}
+				}
+			}
+		}
+
+		//如果出现负权回路。函数返回false值
+		bool BellmanFord(const v& src, vector<w>& dist, vector<int>& pPath) {
+			size_t size = _vertexs.size();
+			size_t srcPos = GetPointIndex(src);
+
+			// vector<W> dist,记录srcPos-其他顶点最短路径权值数组
+			dist.resize(size, max_w);
+
+			// vector<int> pPath 记录srcPos-其他顶点最短路径父顶点数组
+			pPath.resize(size, -1);
+
+			// 先更新srci->srci为缺省值
+			dist[srcPos] = w();
+
+			// 总体最多更新size轮
+			for (size_t time = 0; time < size; time++) {
+				// i->j 更新松弛
+				bool update = false;
+				for (size_t i = 0; i < size; i++) {
+					for (size_t j = 0; j < size; j++) {
+						// srci -> i + i ->j松弛判断
+						if (_matrix[i][j] != max_w && (dist[i] + _matrix[i][j]) < dist[j]) {
+							dist[j]= dist[j] = dist[i] + _matrix[i][j];
+							update = true;
+							pPath[j] = i;
+						}
+					}
+				}
+				if (update == false) {
+					break;//这次没有更新出最短路径，可以退出循环了
+				}
+			}
+
+			//判断负权回路,如果退出循环还可以更新，就是负权回路返回false
+			// 还能更新就是带负权回路
+			for (size_t i = 0; i < size; ++i)
+			{
+				for (size_t j = 0; j < size; ++j)
+				{
+					if (_matrix[i][j] != max_w && dist[i] + _matrix[i][j] < dist[j])
+					{
+						return false;
+					}
+				}
+			}
+			return true;
+		}
+		void FloydWarShall(std::vector<std::vector<w>>& vDist, std::vector<std::vector<int>>& vPath) {
+			size_t size = _vertexs.size();
+
+			//初始化顶点矩阵与路径矩阵
+			vDist.resize(size);
+			vPath.resize(size);
+			for (size_t i = 0; i < size; i++) {
+				vDist[i].resize(size, max_w);
+				vPath[i].resize(size, -1);
+			}
+
+			//直接相连的边更新初始化
+			for (size_t i = 0; i < size; i++) {
+				for (size_t j = 0; j < size; j++) {
+					if (_matrix[i][j] != max_w) {
+						vDist[i][j] = _matrix[i][j];
+						vPath[i][j] = i;//i->j起点是i点
+					}
+					if (i == j) {
+						//i->i时路径长度为0
+						vDist[i][j] = w();
+					}
+				}
+			}
+
+			//最短路径的更新i->{其他顶点}->j
+			//k作为中间点，尝试更新i->j的路径
+			for (size_t k = 0; k < size; k++) {
+				for (size_t i = 0; i < size; i++) {
+					for (size_t j = 0; j < size; j++) {
+						//经过了k点
+						if (vDist[i][k] != max_w && vDist[k][j] != max_w) {
+							if ((vDist[i][k] + vDist[k][j]) < vDist[i][j]) {
+								//经过k更小，则更新长度
+								vDist[i][j] = vDist[i][k] + vDist[k][j];
+								//找上一个与j邻接的节点
+								//k->j入过k与j直接相连，则vPath[i][j]=k
+								//但是k->j不一定直接相连 k->...->x->j则vPath[i][j]=x,就是vPath[k][j]
+								vPath[i][j] = vPath[k][j];
+							}
+						}
+					}
+				}
+			}
+		}
+
+		//打印最短路径
+		void PrintShortPath(const v& src, std::vector<w>& dist, std::vector<int>& pPath) {
+			size_t srcPos = GetPointIndex(src);
+			size_t size = _vertexs.size();
+			//计算src点到其他点的最短路径长度，src到src=0不用计算
+			for (size_t i = 0; i < size; i++) {
+				if (i != srcPos) {
+					//src到顶点i的最短路径节点（双亲表示法）
+					std::vector<int>path;
+					size_t pos = i;
+					std::cout <<"最短路径为:";
+					while (pos != srcPos) {
+						path.push_back(pos);
+						pos = pPath[pos];
+					}
+					path.push_back(srcPos);
+					std::reverse(path.begin(), path.end());
+					for (auto index : path) {
+						std::cout << _vertexs[index] << "->";
+					}
+					std::cout << "长度:" << dist[i];
+					std::cout << std::endl;
+				}
+			}
+		}
+
 		void Print() {
 			//打印顶点对应坐标
 			for (size_t i = 0; i < _vertexs.size(); i++) {
